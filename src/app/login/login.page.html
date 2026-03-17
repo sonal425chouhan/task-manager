@@ -1,0 +1,105 @@
+<ion-content class="h-screen bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500">
+  <div class="flex items-center justify-center min-h-screen p-4">
+    <div class="w-full max-w-md">
+      
+      <!-- Logo Section -->
+      <div class="text-center mb-8">
+        <h1 class="text-3xl font-bold text-white">Task Status</h1>
+        <p class="text-white/80 text-sm mt-1">Field Employee Portal</p>
+      </div>
+
+      <!-- Form Section -->
+      <div class="bg-white rounded-2xl p-8 shadow-xl">
+        <div class="text-center mb-6">
+          <h2 class="text-2xl font-semibold text-gray-900">Welcome Back</h2>
+          <p class="text-gray-500 text-sm">Sign in to continue</p>
+        </div>
+
+        <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="space-y-5">
+          <!-- Email Field -->
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">Email</label>
+            <div class="relative">
+              <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <ion-icon name="mail-outline" class="text-gray-400"></ion-icon>
+              </div>
+              <input
+                type="email"
+                formControlName="email"
+                placeholder="Enter your email"
+                class="w-full pl-10 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-gray-900 focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 transition-all placeholder-gray-400"
+                [class.border-red-300]="email?.invalid && email?.touched"
+              />
+            </div>
+            @if (email?.invalid && email?.touched) {
+              <p class="text-red-500 text-xs mt-1">
+                @if (email?.errors?.['required']) {
+                  <span>Email is required</span>
+                }
+                @if (email?.errors?.['email']) {
+                  <span>Please enter a valid email</span>
+                }
+              </p>
+            }
+          </div>
+
+          <!-- Password Field -->
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">Password</label>
+            <div class="relative">
+              <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <ion-icon name="lock-closed-outline" class="text-gray-400"></ion-icon>
+              </div>
+              <input
+                [type]="showPassword() ? 'text' : 'password'"
+                formControlName="password"
+                placeholder="Enter your password"
+                class="w-full pl-10 pr-12 py-3 bg-gray-50 border border-gray-200 rounded-xl text-gray-900 focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 transition-all placeholder-gray-400"
+                [class.border-red-300]="password?.invalid && password?.touched"
+              />
+              <button
+                type="button"
+                (click)="togglePasswordVisibility()"
+                class="absolute inset-y-0 right-0 pr-3 flex items-center"
+              >
+                <ion-icon [name]="showPassword() ? 'eye-off-outline' : 'eye-outline'" class="text-gray-400"></ion-icon>
+              </button>
+            </div>
+            @if (password?.invalid && password?.touched) {
+              <p class="text-red-500 text-xs mt-1">
+                @if (password?.errors?.['required']) {
+                  <span>Password is required</span>
+                }
+                @if (password?.errors?.['minlength']) {
+                  <span>Password must be at least 6 characters</span>
+                }
+              </p>
+            }
+          </div>
+
+          <!-- Error Message -->
+          @if (errorMessage()) {
+            <div class="flex items-center bg-red-50 border border-red-200 rounded-lg p-3">
+              <ion-icon name="alert-circle-outline" class="text-red-500 mr-2"></ion-icon>
+              <span class="text-red-600 text-sm">{{ errorMessage() }}</span>
+            </div>
+          }
+
+          <!-- Submit Button -->
+          <button
+            type="submit"
+            [disabled]="isLoading()"
+            class="w-full py-3 bg-white text-indigo-600 font-semibold rounded-xl hover:bg-gray-100 transition-all disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center border border-indigo-200"
+          >
+            @if (!isLoading()) {
+              <span>Sign In</span>
+            } @else {
+              <ion-spinner name="circles"></ion-spinner>
+            }
+          </button>
+        </form>
+      </div>
+
+    </div>
+  </div>
+</ion-content>
