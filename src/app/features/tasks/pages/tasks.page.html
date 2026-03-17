@@ -1,0 +1,216 @@
+<ion-header [translucent]="true">
+  <ion-toolbar class="bg-gradient-to-r from-blue-600 to-purple-600">
+    <ion-title class="text-white font-bold">My Tasks</ion-title>
+    <ion-buttons slot="end">
+      <!-- Online/Offline Status -->
+      @if (isOnline()) {
+        <div class="flex items-center mr-2">
+          <div class="w-2 h-2 bg-green-400 rounded-full mr-1 animate-pulse"></div>
+          <span class="text-green-100 text-xs">Online</span>
+        </div>
+      } @else {
+        <div class="flex items-center mr-2">
+          <div class="w-2 h-2 bg-orange-400 rounded-full mr-1"></div>
+          <span class="text-orange-100 text-xs">Offline</span>
+        </div>
+      }
+      <ion-button (click)="logout()" class="text-white">
+        <ion-icon slot="icon-only" name="log-out-outline" class="text-white"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true" class="bg-gray-100">
+  <!-- Create Task Button -->
+  <div class="px-2 pb-2 mt-4 flex justify-end">
+    <button
+      (click)="openCreateModal()"
+      class="px-3 py-2 bg-indigo-600 text-white text-sm font-medium rounded-lg flex items-center gap-1 hover:bg-indigo-700"
+    >
+      <ion-icon name="add" class="text-sm"></ion-icon>
+      New Task
+    </button>
+  </div>
+
+  <!-- Loading State -->
+  @if (loading()) {
+    <div class="flex justify-center items-center py-8">
+      <ion-spinner name="circles" color="primary" size="large"></ion-spinner>
+    </div>
+  }
+
+  <!-- Kanban Board - Full Width -->
+  @if (!loading()) {
+    <div class="grid grid-cols-3 gap-2 px-2 pb-2 min-h-[calc(100vh-140px)]">
+      
+      <!-- Pending Column -->
+      <div class="bg-gray-100 rounded-xl p-2">
+        <div class="flex items-center justify-between mb-2 px-1">
+          <div class="flex items-center gap-2">
+            <span class="w-3 h-3 rounded-full bg-orange-500"></span>
+            <span class="text-sm font-semibold text-gray-700">Pending</span>
+          </div>
+          <span class="text-xs text-gray-500 bg-gray-200 px-2 py-0.5 rounded-full">
+            {{ pendingTasks().length }}
+          </span>
+        </div>
+        
+        <div class="space-y-2">
+          @for (task of pendingTasks(); track task.id) {
+            <div class="task-card bg-white rounded-lg p-2 shadow-sm border border-gray-200">
+              <div class="flex justify-between items-start">
+                <h4 class="text-sm font-medium text-gray-900 flex-1">{{ task.title }}</h4>
+                <button (click)="toggleDropdown(task.id)" class="text-gray-400 hover:text-gray-600 ml-2">
+                  <ion-icon name="ellipsis-vertical" class="text-sm"></ion-icon>
+                </button>
+              </div>
+              <p class="text-xs text-gray-500 mt-1 line-clamp-2">{{ task.description }}</p>
+              
+              <!-- Quick Actions - Inline with title -->
+              @if (openDropdownId() === task.id) {
+                <div class="mt-2 pt-2 border-t border-gray-100 flex gap-2 flex-wrap">
+                  <button (click)="updateTaskStatus(task, taskStatus.InProgress)" class="text-xs text-blue-600 hover:text-blue-700 flex items-center gap-1">
+                    → In Progress
+                  </button>
+                  <button (click)="updateTaskStatus(task, taskStatus.Done)" class="text-xs text-green-600 hover:text-green-700 flex items-center gap-1">
+                    → Done
+                  </button>
+                </div>
+              }
+            </div>
+          } @empty {
+            <div class="text-center py-4 text-gray-400 text-sm">
+              No pending tasks
+            </div>
+          }
+        </div>
+      </div>
+
+      <!-- In Progress Column -->
+      <div class="bg-blue-50 rounded-xl p-2">
+        <div class="flex items-center justify-between mb-2 px-1">
+          <div class="flex items-center gap-2">
+            <span class="w-3 h-3 rounded-full bg-blue-500"></span>
+            <span class="text-sm font-semibold text-gray-700">In Progress</span>
+          </div>
+          <span class="text-xs text-gray-500 bg-blue-200 px-2 py-0.5 rounded-full">
+            {{ inProgressTasks().length }}
+          </span>
+        </div>
+        
+        <div class="space-y-2">
+          @for (task of inProgressTasks(); track task.id) {
+            <div class="task-card bg-white rounded-lg p-2 shadow-sm border border-blue-100">
+              <div class="flex justify-between items-start">
+                <h4 class="text-sm font-medium text-gray-900 flex-1">{{ task.title }}</h4>
+                <button (click)="toggleDropdown(task.id)" class="text-gray-400 hover:text-gray-600 ml-2">
+                  <ion-icon name="ellipsis-vertical" class="text-sm"></ion-icon>
+                </button>
+              </div>
+              <p class="text-xs text-gray-500 mt-1 line-clamp-2">{{ task.description }}</p>
+              
+              <!-- Quick Actions - Inline -->
+              @if (openDropdownId() === task.id) {
+                <div class="mt-2 pt-2 border-t border-gray-100 flex gap-2 flex-wrap">
+                  <button (click)="updateTaskStatus(task, taskStatus.Pending)" class="text-xs text-orange-600 hover:text-orange-700 flex items-center gap-1">
+                    ← Pending
+                  </button>
+                  <button (click)="updateTaskStatus(task, taskStatus.Done)" class="text-xs text-green-600 hover:text-green-700 flex items-center gap-1">
+                    → Done
+                  </button>
+                </div>
+              }
+            </div>
+          } @empty {
+            <div class="text-center py-4 text-gray-400 text-sm">
+              No tasks in progress
+            </div>
+          }
+        </div>
+      </div>
+
+      <!-- Done Column -->
+      <div class="bg-green-50 rounded-xl p-2">
+        <div class="flex items-center justify-between mb-2 px-1">
+          <div class="flex items-center gap-2">
+            <span class="w-3 h-3 rounded-full bg-green-500"></span>
+            <span class="text-sm font-semibold text-gray-700">Done</span>
+          </div>
+          <span class="text-xs text-gray-500 bg-green-200 px-2 py-0.5 rounded-full">
+            {{ doneTasks().length }}
+          </span>
+        </div>
+        
+        <div class="space-y-2">
+          @for (task of doneTasks(); track task.id) {
+            <div class="task-card bg-white rounded-lg p-2 shadow-sm border border-green-100 opacity-75">
+              <div class="flex justify-between items-start">
+                <h4 class="text-sm font-medium text-gray-900 line-through flex-1">{{ task.title }}</h4>
+                <button (click)="toggleDropdown(task.id)" class="text-gray-400 hover:text-gray-600 ml-2">
+                  <ion-icon name="ellipsis-vertical" class="text-sm"></ion-icon>
+                </button>
+              </div>
+              <p class="text-xs text-gray-500 mt-1 line-clamp-2">{{ task.description }}</p>
+              
+              <!-- Quick Actions - Inline -->
+              @if (openDropdownId() === task.id) {
+                <div class="mt-2 pt-2 border-t border-gray-100">
+                  <button (click)="updateTaskStatus(task, taskStatus.Pending)" class="text-xs text-orange-600 hover:text-orange-700 flex items-center gap-1">
+                    ← Pending
+                  </button>
+                </div>
+              }
+            </div>
+          } @empty {
+            <div class="text-center py-4 text-gray-400 text-sm">
+              No completed tasks
+            </div>
+          }
+        </div>
+      </div>
+
+    </div>
+  }
+</ion-content>
+
+<!-- Create Task Modal -->
+@if (showCreateModal()) {
+  <div class="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+    <div class="bg-white rounded-2xl w-full max-w-md p-6">
+      <div class="flex justify-between items-center mb-4">
+        <h2 class="text-xl font-bold text-gray-900">Create New Task</h2>
+        <button (click)="closeCreateModal()" class="text-gray-400 hover:text-gray-600">
+          <ion-icon name="close-outline" class="text-2xl"></ion-icon>
+        </button>
+      </div>
+      
+      <form [formGroup]="createTaskForm" (ngSubmit)="createTask()">
+        <div class="mb-4">
+          <label class="block text-sm font-medium text-gray-700 mb-2">Task Title</label>
+          <input
+            type="text"
+            formControlName="title"
+            placeholder="Enter task title"
+            class="w-full px-4 py-3 bg-white border border-gray-200 rounded-lg text-gray-900 focus:outline-none focus:border-indigo-500"
+          />
+        </div>
+        <div class="mb-4">
+          <label class="block text-sm font-medium text-gray-700 mb-2">Description</label>
+          <textarea
+            formControlName="description"
+            placeholder="Enter task description"
+            rows="4"
+            class="w-full px-4 py-3 bg-white border border-gray-200 rounded-lg text-gray-900 focus:outline-none focus:border-indigo-500 resize-none"
+          ></textarea>
+        </div>
+        <button
+          type="submit"
+          class="w-full py-3 bg-indigo-600 text-white font-semibold rounded-lg hover:bg-indigo-700"
+        >
+          Create Task
+        </button>
+      </form>
+    </div>
+  </div>
+}

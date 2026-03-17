@@ -3,6 +3,64 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Custom Status Select Styles */
+.status-select {
+  --padding-start: 8px;
+  --padding-end: 8px;
+  height: 32px;
+  font-size: 12px;
+  border-radius: 6px;
+  border: 1px solid;
+}
+
+.status-select.select-orange {
+  --border-color: #f97316;
+  color: #ea580c;
+}
+
+.status-select.select-blue {
+  --border-color: #3b82f6;
+  color: #2563eb;
+}
+
+.status-select.select-green {
+  --border-color: #22c55e;
+  color: #16a34a;
+}
+
+.status-select-popover {
+  --width: 140px;
+}
+
+.status-select-popover .select-option {
+  font-size: 14px;
+  padding: 12px;
+}
+
+/* Toast Styles */
+.toast-success {
+  --background: #22c55e;
+  --color: #ffffff;
+  --font-weight: 600;
+  --border-radius: 8px;
+  --box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+.toast-small {
+  --max-width: 220px;
+  --width: auto;
+  margin-bottom: 16px;
+  margin-right: 16px;
+  --start: auto;
+}
+
+.toast-small .toast-wrapper {
+  position: fixed;
+  top: 16px;
+  right: 16px;
+  left: auto;
+}
+
 /*
  * App Global CSS
  * ----------------------------------------------------------------------------

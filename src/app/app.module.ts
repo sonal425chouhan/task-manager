@@ -7,23 +7,25 @@ import { IonicModule, IonicRouteStrategy } from '@ionic/angular';
 import { AppComponent } from './app.component';
 import { AppRoutingModule } from './app-routing.module';
 
-import { provideFirebaseApp, initializeApp } from '@angular/fire/app';
-import { provideFirestore, getFirestore } from '@angular/fire/firestore';
 import { provideAuth, getAuth } from '@angular/fire/auth';
 
-import { environment } from '../environments/environment';
 import { EffectsModule } from '@ngrx/effects';
 
-/* NgRx */
 import { StoreModule } from '@ngrx/store';
+import { taskReducer } from '@app/features/tasks/store/task.reducer';
+import { TaskEffects } from '@app/features/tasks/store/task.effects';
 
 @NgModule({
   declarations: [AppComponent],
-  imports: [BrowserModule, IonicModule.forRoot(), AppRoutingModule, EffectsModule.forRoot([]), StoreModule.forRoot({})],
+  imports: [
+    BrowserModule,
+    IonicModule.forRoot(),
+    AppRoutingModule,
+    StoreModule.forRoot({ tasks: taskReducer }),
+    EffectsModule.forRoot([TaskEffects])
+  ],
   providers: [
     { provide: RouteReuseStrategy, useClass: IonicRouteStrategy },
-    provideFirebaseApp(() => initializeApp(environment.firebase)),
-    provideFirestore(() => getFirestore()),
     provideAuth(() => getAuth())
   ],
   bootstrap: [AppComponent],

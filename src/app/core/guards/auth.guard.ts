@@ -1,7 +1,7 @@
 import { Injectable, inject } from '@angular/core';
 import { CanActivate, Router, UrlTree } from '@angular/router';
 import { Observable, map, take } from 'rxjs';
-import { AuthService } from '../services/auth.service';
+import { AuthService } from '@app/core/services/auth.service';
 
 @Injectable({
   providedIn: 'root'
@@ -17,7 +17,6 @@ export class AuthGuard implements CanActivate {
         if (user) {
           return true;
         }
-        // Redirect to login if not authenticated
         return this.router.createUrlTree(['/login']);
       })
     );
